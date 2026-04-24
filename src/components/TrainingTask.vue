@@ -14,88 +14,92 @@
     
     <!-- 任务详情返回按钮 -->
     <div class="page-header compact" v-else>
-      <button class="back-button" @click="backToTaskList">
+      <el-button type="info" @click="backToTaskList" class="back-button">
         <span class="back-icon">←</span>
         <span class="back-text">返回任务列表</span>
-      </button>
+      </el-button>
     </div>
     
     <!-- 任务列表 -->
     <div class="task-list-container" v-if="!currentTask">
-      <div class="task-grid">
-        <div 
-          v-for="task in tasks" 
-          :key="task.id"
-          class="task-card"
-          :class="{ 
-            'task-completed': task.completed, 
-            'task-in-progress': task.inProgress 
-          }"
-        >
-          <div class="task-card-header">
-            <div class="task-id-badge">{{ String(task.id).padStart(2, '0') }}</div>
-            <div class="task-status" :class="'status-' + task.statusType">
-              <span class="status-dot"></span>
-              <span class="status-text">{{ task.statusText }}</span>
+      <el-row :gutter="24">
+        <el-col :span="12" v-for="task in tasks" :key="task.id">
+          <el-card 
+            class="task-card"
+            :class="{ 
+              'task-completed': task.completed, 
+              'task-in-progress': task.inProgress 
+            }"
+            :body-style="{ padding: '24px' }"
+          >
+            <div class="task-card-header">
+              <div class="task-id-badge">{{ String(task.id).padStart(2, '0') }}</div>
+              <el-tag :type="task.statusType" class="task-status">
+                <span class="status-dot"></span>
+                <span class="status-text">{{ task.statusText }}</span>
+              </el-tag>
             </div>
-          </div>
-          
-          <div class="task-card-body">
-            <h3 class="task-title">{{ task.title }}</h3>
-            <p class="task-description">{{ task.description }}</p>
             
-            <div class="task-meta">
-              <div class="meta-item">
-                <span class="meta-icon">🎯</span>
-                <span class="meta-text">{{ task.target }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-icon">💡</span>
-                <span class="meta-text">{{ task.hint }}</span>
+            <div class="task-card-body">
+              <h3 class="task-title">{{ task.title }}</h3>
+              <p class="task-description">{{ task.description }}</p>
+              
+              <div class="task-meta">
+                <div class="meta-item">
+                  <span class="meta-icon">🎯</span>
+                  <span class="meta-text">{{ task.target }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">💡</span>
+                  <span class="meta-text">{{ task.hint }}</span>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div class="task-card-footer">
-            <button 
-              v-if="!task.completed && !task.inProgress"
-              class="action-button primary"
-              @click="startTask(task.id)"
-            >
-              <span class="button-text">开始任务</span>
-              <span class="button-arrow">→</span>
-            </button>
-            <button 
-              v-else-if="task.inProgress"
-              class="action-button success"
-              @click="viewTask(task.id)"
-            >
-              <span class="button-text">继续任务</span>
-              <span class="button-arrow">→</span>
-            </button>
-            <button 
-              v-else
-              class="action-button secondary"
-              @click="viewTask(task.id)"
-            >
-              <span class="button-text">查看详情</span>
-              <span class="button-arrow">→</span>
-            </button>
-          </div>
-        </div>
-      </div>
+            
+            <div class="task-card-footer">
+              <el-button 
+                v-if="!task.completed && !task.inProgress"
+                type="primary" 
+                class="action-button primary"
+                @click="startTask(task.id)"
+              >
+                <span class="button-text">开始任务</span>
+                <span class="button-arrow">→</span>
+              </el-button>
+              <el-button 
+                v-else-if="task.inProgress"
+                type="warning" 
+                class="action-button success"
+                @click="viewTask(task.id)"
+              >
+                <span class="button-text">继续任务</span>
+                <span class="button-arrow">→</span>
+              </el-button>
+              <el-button 
+                v-else
+                type="info" 
+                class="action-button secondary"
+                @click="viewTask(task.id)"
+              >
+                <span class="button-text">查看详情</span>
+                <span class="button-arrow">→</span>
+              </el-button>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
     
     <!-- 任务详情 -->
     <div class="task-detail-container" v-if="currentTask">
-      <div class="detail-main">
+      <el-card class="detail-main" :body-style="{ padding: '40px' }">
         <div class="detail-header-section">
           <div class="detail-id-badge">任务 {{ String(currentTask.id).padStart(2, '0') }}</div>
           <h2 class="detail-title">{{ currentTask.title }}</h2>
-          <div class="detail-status" :class="'status-' + currentTask.statusType">
+          <el-tag :type="currentTask.statusType" class="detail-status">
             <span class="status-dot"></span>
             <span class="status-text">{{ currentTask.statusText }}</span>
-          </div>
+          </el-tag>
         </div>
         
         <div class="detail-content">
@@ -128,26 +132,33 @@
               <span class="title-icon">⚙️</span>
               <span>推荐配置</span>
             </div>
-            <div class="config-grid">
-              <div v-for="config in currentTask.recommendedConfig" :key="config.param" class="config-item">
-                <div class="config-label">{{ config.param }}</div>
-                <div class="config-value">{{ config.value }}</div>
-              </div>
-            </div>
+            <el-row :gutter="12" class="config-grid">
+              <el-col :span="12" v-for="config in currentTask.recommendedConfig" :key="config.param">
+                <el-card class="config-item" :body-style="{ padding: '14px 18px' }">
+                  <div class="config-label">{{ config.param }}</div>
+                  <div class="config-value">{{ config.value }}</div>
+                </el-card>
+              </el-col>
+            </el-row>
           </div>
         </div>
         
         <div class="detail-actions">
-          <button class="main-action-button" @click="navigateToParamConfig">
+          <el-button type="success" @click="navigateToParamConfig" class="main-action-button">
             <span class="button-icon">🚀</span>
             <span class="button-text">前往参数配置</span>
-          </button>
-          <button v-if="currentTask.inProgress" class="complete-button" @click="completeCurrentTask">
+          </el-button>
+          <el-button 
+            v-if="currentTask.inProgress" 
+            type="info" 
+            @click="completeCurrentTask" 
+            class="complete-button"
+          >
             <span class="button-icon">✓</span>
             <span class="button-text">标记完成</span>
-          </button>
+          </el-button>
         </div>
-      </div>
+      </el-card>
     </div>
   </div>
 </template>
@@ -167,7 +178,7 @@ const loadTasksFromStorage = () => {
         if (savedTask) {
           task.completed = savedTask.completed
           task.inProgress = false // 确保刷新后不会保持进行中状态
-          task.statusType = savedTask.completed ? 'success' : 'default'
+          task.statusType = savedTask.completed ? 'success' : 'info'
           task.statusText = savedTask.completed ? '已完成' : '未完成'
         }
       })
@@ -212,7 +223,7 @@ const tasks = ref([
     environment: 'mountain',
     completed: false,
     inProgress: false,
-    statusType: 'default',
+    statusType: 'info',
     statusText: '未完成'
   },
   {
@@ -230,7 +241,7 @@ const tasks = ref([
     environment: 'interference',
     completed: false,
     inProgress: false,
-    statusType: 'default',
+    statusType: 'info',
     statusText: '未完成'
   },
   {
@@ -248,7 +259,7 @@ const tasks = ref([
     environment: 'city',
     completed: false,
     inProgress: false,
-    statusType: 'default',
+    statusType: 'info',
     statusText: '未完成'
   },
   {
@@ -266,7 +277,7 @@ const tasks = ref([
     environment: 'city',
     completed: false,
     inProgress: false,
-    statusType: 'default',
+    statusType: 'info',
     statusText: '未完成'
   }
 ])
@@ -303,7 +314,7 @@ const backToTaskList = () => {
     const task = tasks.value.find(t => t.id === currentTask.value.id)
     if (task && !task.completed) {
       task.inProgress = false
-      task.statusType = 'default'
+      task.statusType = 'info'
       task.statusText = '未完成'
     }
   }
@@ -417,7 +428,6 @@ onMounted(() => {
   color: #e0e6ed;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -435,22 +445,13 @@ onMounted(() => {
   max-width: 1200px;
 }
 
-.task-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
 .task-card {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .task-card::before {
@@ -525,21 +526,6 @@ onMounted(() => {
   letter-spacing: 1px;
 }
 
-.status-default {
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
-}
-
-.status-success {
-  background: rgba(0, 255, 136, 0.15);
-  color: #00ff88;
-}
-
-.status-warning {
-  background: rgba(255, 165, 0, 0.15);
-  color: #ffa500;
-}
-
 .status-dot {
   width: 6px;
   height: 6px;
@@ -547,7 +533,7 @@ onMounted(() => {
   background: currentColor;
 }
 
-.status-warning .status-dot {
+.task-status.is-warning .status-dot {
   animation: blink 1.5s ease-in-out infinite;
 }
 
@@ -557,7 +543,6 @@ onMounted(() => {
 }
 
 .task-card-body {
-  flex: 1;
   margin-bottom: 20px;
 }
 
@@ -611,14 +596,13 @@ onMounted(() => {
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
 }
 
 .action-button.primary {
   background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
   color: #0a0e14;
+  border: none;
 }
 
 .action-button.primary:hover {
@@ -629,6 +613,7 @@ onMounted(() => {
 .action-button.success {
   background: linear-gradient(135deg, #ffa500 0%, #cc8400 100%);
   color: #0a0e14;
+  border: none;
 }
 
 .action-button.success:hover {
@@ -664,7 +649,6 @@ onMounted(() => {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid #1f2937;
   border-radius: 20px;
-  padding: 40px;
   position: relative;
   overflow: hidden;
 }
@@ -750,9 +734,6 @@ onMounted(() => {
 }
 
 .config-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
   padding-left: 26px;
 }
 
@@ -760,7 +741,6 @@ onMounted(() => {
   background: rgba(31, 41, 55, 0.5);
   border: 1px solid #1f2937;
   border-radius: 10px;
-  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -799,7 +779,6 @@ onMounted(() => {
   font-size: 15px;
   font-weight: 700;
   color: #0a0e14;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -820,7 +799,6 @@ onMounted(() => {
   font-size: 15px;
   font-weight: 600;
   color: #00ff88;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 

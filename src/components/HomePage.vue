@@ -3,10 +3,12 @@
     <!-- 顶部英雄区域 -->
     <div class="hero-section">
       <div class="hero-content">
-        <div class="hero-badge">
-          <span class="badge-icon">◆</span>
-          <span class="badge-text">战术指挥中心</span>
-        </div>
+        <el-card class="hero-badge" :body-style="{ padding: '8px 16px', borderRadius: '50px' }">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge-icon">◆</span>
+            <span class="badge-text">战术指挥中心</span>
+          </div>
+        </el-card>
         <h1 class="hero-title">
           <span class="title-line">野战通信</span>
           <span class="title-line accent">参数配置训练</span>
@@ -31,29 +33,30 @@
           </div>
           <div class="section-line"></div>
         </div>
-        <div class="quick-start-card">
+        <el-card class="quick-start-card" :body-style="{ padding: '32px' }">
           <p class="quick-desc">选择战场环境，立即体验通信参数配置</p>
           <div class="environment-cards">
-            <div 
+            <el-card 
               v-for="env in environments" 
               :key="env.value"
               class="env-card"
               :class="{ active: selectedEnv === env.value }"
               @click="selectEnv(env.value)"
+              :body-style="{ padding: '28px 24px', textAlign: 'center' }"
             >
               <div class="env-background" :style="{ background: env.gradient }"></div>
               <div class="env-content">
                 <div class="env-icon">{{ env.icon }}</div>
                 <div class="env-name">{{ env.name }}</div>
-                <div class="env-tag">{{ env.tag }}</div>
+                <el-tag class="env-tag" size="small">{{ env.tag }}</el-tag>
               </div>
-            </div>
+            </el-card>
           </div>
-          <button class="start-btn" @click="startTraining">
+          <el-button class="start-btn" @click="startTraining" type="primary" round>
             <span class="btn-text">开始训练</span>
             <span class="btn-arrow">→</span>
-          </button>
-        </div>
+          </el-button>
+        </el-card>
       </div>
       
       <!-- 平台统计 -->
@@ -66,7 +69,7 @@
           <div class="section-line"></div>
         </div>
         <div class="stats-grid">
-          <div class="stat-card">
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
             <div class="stat-header">
               <div class="stat-icon-wrapper">
                 <span class="stat-icon">🎯</span>
@@ -79,9 +82,9 @@
               <span class="detail-divider">/</span>
               <span class="detail-item completed">已完成: {{ taskStats.completed }}</span>
             </div>
-          </div>
+          </el-card>
           
-          <div class="stat-card">
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
             <div class="stat-header">
               <div class="stat-icon-wrapper accent">
                 <span class="stat-icon">🏆</span>
@@ -94,9 +97,9 @@
               <span>城市: {{ bestScores.city || '--' }}</span>
               <span>干扰: {{ bestScores.interference || '--' }}</span>
             </div>
-          </div>
+          </el-card>
           
-          <div class="stat-card">
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
             <div class="stat-header">
               <div class="stat-icon-wrapper success">
                 <span class="stat-icon">📈</span>
@@ -105,11 +108,15 @@
             </div>
             <div class="stat-value success">{{ passRate }}<span class="value-unit">%</span></div>
             <div class="stat-progress">
-              <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: passRate + '%', background: passRateColor }"></div>
-              </div>
+              <el-progress 
+                :percentage="passRate" 
+                :color="passRateColor" 
+                :stroke-width="6" 
+                :text-inside="false" 
+                show-text="false"
+              />
             </div>
-          </div>
+          </el-card>
         </div>
       </div>
       
@@ -123,23 +130,30 @@
             </div>
           </div>
           <div class="task-list">
-            <div 
+            <el-card 
               v-for="(task, index) in recommendTasks" 
               :key="task.id"
               class="task-item"
               @click="goToTask(task.id)"
+              :body-style="{ padding: '20px' }"
             >
-              <div class="task-level" :class="'level-' + task.level">
-                {{ task.levelText }}
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <el-tag 
+                  class="task-level" 
+                  :class="'level-' + task.level"
+                  size="small"
+                >
+                  {{ task.levelText }}
+                </el-tag>
+                <div class="task-info">
+                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-desc">{{ task.description }}</div>
+                </div>
+                <div class="task-action">
+                  <span class="action-icon">▶</span>
+                </div>
               </div>
-              <div class="task-info">
-                <div class="task-title">{{ task.title }}</div>
-                <div class="task-desc">{{ task.description }}</div>
-              </div>
-              <div class="task-action">
-                <span class="action-icon">▶</span>
-              </div>
-            </div>
+            </el-card>
           </div>
         </div>
         
@@ -152,22 +166,25 @@
             </div>
           </div>
           <div class="knowledge-list">
-            <div 
+            <el-card 
               v-for="item in knowledgeArticles" 
               :key="item.id"
               class="knowledge-item"
               @click="goToKnowledge(item.tab, item.id)"
+              :body-style="{ padding: '20px' }"
             >
-              <div class="knowledge-icon">
-                <span>💡</span>
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="knowledge-icon">
+                  <span>💡</span>
+                </div>
+                <div class="knowledge-content">
+                  <div class="knowledge-title">{{ item.title }}</div>
+                </div>
+                <div class="knowledge-action">
+                  <span class="action-arrow">→</span>
+                </div>
               </div>
-              <div class="knowledge-content">
-                <div class="knowledge-title">{{ item.title }}</div>
-              </div>
-              <div class="knowledge-action">
-                <span class="action-arrow">→</span>
-              </div>
-            </div>
+            </el-card>
           </div>
         </div>
       </div>
@@ -181,9 +198,9 @@
           </div>
           <div class="section-line"></div>
         </div>
-        <div class="history-wrapper">
+        <el-card class="history-wrapper" :body-style="{ padding: '24px' }">
           <HistoryRecord ref="historyRecordRef" />
-        </div>
+        </el-card>
       </div>
     </div>
   </div>
@@ -372,7 +389,6 @@ const goToKnowledge = (tab, articleId) => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
   background: rgba(0, 255, 136, 0.1);
   border: 1px solid rgba(0, 255, 136, 0.2);
   border-radius: 50px;
@@ -512,7 +528,6 @@ const goToKnowledge = (tab, articleId) => {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 32px;
   position: relative;
   overflow: hidden;
 }
@@ -544,14 +559,13 @@ const goToKnowledge = (tab, articleId) => {
 .env-card {
   position: relative;
   cursor: pointer;
-  padding: 28px 24px;
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   width: 160px;
   background: rgba(31, 41, 55, 0.5);
   border: 2px solid #1f2937;
+  border-radius: 16px;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .env-background {
@@ -595,12 +609,11 @@ const goToKnowledge = (tab, articleId) => {
 }
 
 .env-tag {
-  display: inline-block;
-  padding: 4px 12px;
   background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border: none;
   border-radius: 50px;
   font-size: 11px;
-  color: #00ff88;
   letter-spacing: 1px;
 }
 
@@ -648,7 +661,6 @@ const goToKnowledge = (tab, articleId) => {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 28px;
   position: relative;
   overflow: hidden;
 }
@@ -747,19 +759,6 @@ const goToKnowledge = (tab, articleId) => {
   margin-top: 8px;
 }
 
-.progress-bar {
-  height: 6px;
-  background: #1f2937;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 10px;
-  transition: width 0.5s ease;
-}
-
 /* 两列布局 */
 .two-column-layout {
   display: grid;
@@ -780,10 +779,6 @@ const goToKnowledge = (tab, articleId) => {
 }
 
 .task-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
   border: 1px solid #1f2937;
   border-radius: 12px;
@@ -797,8 +792,6 @@ const goToKnowledge = (tab, articleId) => {
 }
 
 .task-level {
-  padding: 6px 14px;
-  border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -808,16 +801,19 @@ const goToKnowledge = (tab, articleId) => {
 .level-beginner {
   background: rgba(102, 194, 58, 0.15);
   color: #00ff88;
+  border: none;
 }
 
 .level-intermediate {
   background: rgba(230, 162, 60, 0.15);
   color: #ffa500;
+  border: none;
 }
 
 .level-advanced {
   background: rgba(0, 212, 255, 0.15);
   color: #00d4ff;
+  border: none;
 }
 
 .task-info {
@@ -860,10 +856,6 @@ const goToKnowledge = (tab, articleId) => {
 }
 
 .knowledge-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
   border: 1px solid #1f2937;
   border-radius: 12px;
@@ -929,6 +921,32 @@ const goToKnowledge = (tab, articleId) => {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 24px;
+}
+
+/* Element Plus 自定义样式 */
+:deep(.el-card) {
+  background: transparent !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 16px !important;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%) !important;
+  border: none !important;
+  color: #0a0e14 !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+}
+
+:deep(.el-button--primary:hover) {
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.4) !important;
+}
+
+:deep(.el-progress__bar) {
+  background-color: #1f2937 !important;
+}
+
+:deep(.el-progress__bar__inner) {
+  border-radius: 10px !important;
 }
 </style>

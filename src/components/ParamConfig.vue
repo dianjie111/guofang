@@ -11,74 +11,88 @@
 
     <div class="config-grid">
       <!-- 频率参数 -->
-      <div class="config-card">
-        <div class="card-header">
-          <div class="header-icon">📡</div>
-          <div class="header-text">
-            <h3 class="card-title">频率选择</h3>
-            <p class="card-subtitle">选择合适的通信频段</p>
+      <el-card class="config-card" :body-style="{ padding: '24px' }">
+        <template #header>
+          <div class="card-header">
+            <div class="header-icon">📡</div>
+            <div class="header-text">
+              <h3 class="card-title">频率选择</h3>
+              <p class="card-subtitle">选择合适的通信频段</p>
+            </div>
           </div>
-        </div>
+        </template>
         <div class="card-body">
-          <div class="option-grid">
-            <button
+          <el-radio-group v-model="form.frequency" class="option-grid">
+            <el-radio
               v-for="option in frequencyOptions"
               :key="option.value"
-              class="option-button"
-              :class="{ active: form.frequency === option.value }"
-              @click="form.frequency = option.value"
+              :label="option.value"
+              class="option-item"
             >
-              <div class="option-icon">{{ option.icon }}</div>
-              <div class="option-label">{{ option.label }}</div>
-              <div class="option-desc">{{ option.shortDesc }}</div>
-            </button>
-          </div>
-          <div class="hint-box" v-if="frequencyHint">
-            <div class="hint-icon">ℹ️</div>
-            <div class="hint-text">{{ frequencyHint.text }}</div>
-          </div>
+              <div class="option-content">
+                <div class="option-icon">{{ option.icon }}</div>
+                <div class="option-label">{{ option.label }}</div>
+                <div class="option-desc">{{ option.shortDesc }}</div>
+              </div>
+            </el-radio>
+          </el-radio-group>
+          <el-alert
+            v-if="frequencyHint"
+            :title="frequencyHint.text"
+            type="info"
+            :closable="false"
+            class="hint-box"
+          />
         </div>
-      </div>
+      </el-card>
 
       <!-- 加密方式 -->
-      <div class="config-card">
-        <div class="card-header">
-          <div class="header-icon">🔐</div>
-          <div class="header-text">
-            <h3 class="card-title">加密方式</h3>
-            <p class="card-subtitle">选择安全的通信加密</p>
+      <el-card class="config-card" :body-style="{ padding: '24px' }">
+        <template #header>
+          <div class="card-header">
+            <div class="header-icon">🔐</div>
+            <div class="header-text">
+              <h3 class="card-title">加密方式</h3>
+              <p class="card-subtitle">选择安全的通信加密</p>
+            </div>
           </div>
-        </div>
+        </template>
         <div class="card-body">
-          <div class="option-grid">
-            <button
+          <el-radio-group v-model="form.encryption" class="option-grid">
+            <el-radio
               v-for="option in encryptionOptions"
               :key="option.value"
-              class="option-button"
-              :class="{ active: form.encryption === option.value }"
-              @click="form.encryption = option.value"
+              :label="option.value"
+              class="option-item"
             >
-              <div class="option-icon">{{ option.icon }}</div>
-              <div class="option-label">{{ option.label }}</div>
-              <div class="option-desc">{{ option.shortDesc }}</div>
-            </button>
-          </div>
-          <div class="hint-box" v-if="encryptionHint">
-            <div class="hint-icon">💡</div>
-            <div class="hint-text">{{ encryptionHint.text }}</div>
-          </div>
+              <div class="option-content">
+                <div class="option-icon">{{ option.icon }}</div>
+                <div class="option-label">{{ option.label }}</div>
+                <div class="option-desc">{{ option.shortDesc }}</div>
+              </div>
+            </el-radio>
+          </el-radio-group>
+          <el-alert
+            v-if="encryptionHint"
+            :title="encryptionHint.text"
+            type="info"
+            :closable="false"
+            class="hint-box"
+          />
         </div>
-      </div>
+      </el-card>
 
       <!-- 功率控制 -->
-      <div class="config-card full-width">
-        <div class="card-header">
-          <div class="header-icon">⚡</div>
-          <div class="header-text">
-            <h3 class="card-title">功率控制</h3>
-            <p class="card-subtitle">调整发射功率强度</p>
+      <el-card class="config-card full-width" :body-style="{ padding: '24px' }">
+        <template #header>
+          <div class="card-header">
+            <div class="header-icon">⚡</div>
+            <div class="header-text">
+              <h3 class="card-title">功率控制</h3>
+              <p class="card-subtitle">调整发射功率强度</p>
+            </div>
           </div>
-        </div>
+        </template>
         <div class="card-body">
           <div class="power-control">
             <div class="power-indicator">
@@ -90,60 +104,68 @@
                   :class="{ active: i <= form.power, warning: i > 8, low: i <= 2 }"
                 ></div>
               </div>
-              <div class="power-value">
+              <el-tag size="large" class="power-value-tag">
                 <span class="power-number">{{ form.power }}</span>
                 <span class="power-unit">/10</span>
-              </div>
+              </el-tag>
             </div>
-            <input
-              type="range"
-              class="power-slider"
+            <el-slider
+              v-model="form.power"
               :min="1"
               :max="10"
               :step="1"
-              v-model="form.power"
+              class="power-slider"
             />
             <div class="power-labels">
               <span class="label-left">低功率</span>
               <span class="label-right">高功率</span>
             </div>
           </div>
-          <div class="hint-box" v-if="powerHint">
-            <div class="hint-icon">⚠️</div>
-            <div class="hint-text">{{ powerHint.text }}</div>
-          </div>
+          <el-alert
+            v-if="powerHint"
+            :title="powerHint.text"
+            type="info"
+            :closable="false"
+            class="hint-box"
+          />
         </div>
-      </div>
+      </el-card>
 
       <!-- 抗干扰模式 -->
-      <div class="config-card">
-        <div class="card-header">
-          <div class="header-icon">🛡️</div>
-          <div class="header-text">
-            <h3 class="card-title">抗干扰模式</h3>
-            <p class="card-subtitle">增强通信抗干扰能力</p>
+      <el-card class="config-card" :body-style="{ padding: '24px' }">
+        <template #header>
+          <div class="card-header">
+            <div class="header-icon">🛡️</div>
+            <div class="header-text">
+              <h3 class="card-title">抗干扰模式</h3>
+              <p class="card-subtitle">增强通信抗干扰能力</p>
+            </div>
           </div>
-        </div>
+        </template>
         <div class="card-body">
-          <div class="option-grid">
-            <button
+          <el-radio-group v-model="form.antiInterference" class="option-grid">
+            <el-radio
               v-for="option in antiInterferenceOptions"
               :key="option.value"
-              class="option-button"
-              :class="{ active: form.antiInterference === option.value }"
-              @click="form.antiInterference = option.value"
+              :label="option.value"
+              class="option-item"
             >
-              <div class="option-icon">{{ option.icon }}</div>
-              <div class="option-label">{{ option.label }}</div>
-              <div class="option-desc">{{ option.shortDesc }}</div>
-            </button>
-          </div>
-          <div class="hint-box danger" v-if="antiInterferenceHint">
-            <div class="hint-icon">🔴</div>
-            <div class="hint-text">{{ antiInterferenceHint.text }}</div>
-          </div>
+              <div class="option-content">
+                <div class="option-icon">{{ option.icon }}</div>
+                <div class="option-label">{{ option.label }}</div>
+                <div class="option-desc">{{ option.shortDesc }}</div>
+              </div>
+            </el-radio>
+          </el-radio-group>
+          <el-alert
+            v-if="antiInterferenceHint"
+            :title="antiInterferenceHint.text"
+            :type="form.antiInterference === 'none' ? 'warning' : 'info'"
+            :closable="false"
+            class="hint-box"
+          />
         </div>
-      </div>
+      </el-card>
     </div>
   </div>
 </template>
@@ -332,7 +354,6 @@ defineExpose({
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 24px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -362,7 +383,7 @@ defineExpose({
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .header-icon {
@@ -404,29 +425,33 @@ defineExpose({
   margin-bottom: 16px;
 }
 
-.option-button {
+.option-item {
   background: rgba(31, 41, 55, 0.5);
   border: 2px solid #1f2937;
   border-radius: 12px;
   padding: 16px 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  text-align: center;
 }
 
-.option-button:hover {
+.option-item:hover {
   background: rgba(31, 41, 55, 0.8);
   border-color: #374151;
   transform: translateY(-2px);
 }
 
-.option-button.active {
+.option-item.is-checked {
   background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 212, 255, 0.15) 100%);
   border-color: #00ff88;
   box-shadow: 0 4px 20px rgba(0, 255, 136, 0.2);
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .option-icon {
@@ -483,20 +508,18 @@ defineExpose({
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-.power-value {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 8px 16px;
+.power-value-tag {
   background: rgba(0, 255, 136, 0.1);
-  border-radius: 10px;
+  border-color: rgba(0, 255, 136, 0.3);
+  color: #00ff88;
   font-family: 'Courier New', monospace;
+  padding: 8px 16px;
+  border-radius: 10px;
 }
 
 .power-number {
   font-size: 32px;
   font-weight: 800;
-  color: #00ff88;
 }
 
 .power-unit {
@@ -506,22 +529,7 @@ defineExpose({
 
 .power-slider {
   width: 100%;
-  height: 8px;
-  background: #1f2937;
-  border-radius: 10px;
-  outline: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.power-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 255, 136, 0.4);
+  margin: 20px 0;
 }
 
 .power-labels {
@@ -533,29 +541,13 @@ defineExpose({
 }
 
 .hint-box {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
+  margin-top: 16px;
   background: rgba(0, 212, 255, 0.08);
-  border: 1px solid rgba(0, 212, 255, 0.15);
-  border-radius: 10px;
+  border-color: rgba(0, 212, 255, 0.15);
 }
 
-.hint-box.danger {
+.hint-box.is-warning {
   background: rgba(255, 107, 107, 0.08);
   border-color: rgba(255, 107, 107, 0.15);
-}
-
-.hint-icon {
-  font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.hint-text {
-  font-size: 13px;
-  color: #d1d5db;
-  line-height: 1.6;
 }
 </style>

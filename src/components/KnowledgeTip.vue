@@ -1,22 +1,25 @@
 <template>
-  <div class="knowledge-tip-card">
-    <div class="card-header">
-      <div class="header-icon">💡</div>
-      <div class="header-text">
-        <h3 class="card-title">知识小贴士</h3>
-        <p class="card-subtitle">根据配置获取相关知识</p>
-      </div>
-    </div>
-    <div class="tip-content">
-      <div class="tip-box">
-        <div class="tip-icon">📚</div>
-        <div class="tip-text">
-          <div class="tip-title">{{ tipTitle }}</div>
-          <div class="tip-description">{{ tipContent }}</div>
+  <el-card class="knowledge-tip-card" :body-style="{ padding: '24px' }">
+    <template #header>
+      <div class="card-header">
+        <div class="header-icon">💡</div>
+        <div class="header-text">
+          <h3 class="card-title">知识小贴士</h3>
+          <p class="card-subtitle">根据配置获取相关知识</p>
         </div>
       </div>
+    </template>
+    <div class="tip-content">
+      <el-alert
+        :title="tipTitle"
+        :description="tipContent"
+        type="info"
+        :closable="false"
+        show-icon
+        class="tip-box"
+      />
     </div>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
@@ -86,15 +89,27 @@ watch(
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 24px;
+  position: relative;
+  overflow: hidden;
   margin-bottom: 20px;
+}
+
+.knowledge-tip-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #00d4ff 30%, #00ff88 70%, transparent 100%);
+  opacity: 0.5;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .header-icon {
@@ -125,37 +140,25 @@ watch(
 }
 
 .tip-content {
-  margin-top: 10px;
+  margin-top: 24px;
 }
 
 .tip-box {
-  display: flex;
-  gap: 16px;
-  padding: 20px;
   background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-color: rgba(0, 212, 255, 0.2);
   border-radius: 12px;
 }
 
-.tip-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-}
-
-.tip-text {
-  flex: 1;
-}
-
-.tip-title {
-  font-size: 16px;
-  font-weight: 700;
+.tip-box :deep(.el-alert__title) {
   color: #00d4ff;
-  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 16px;
 }
 
-.tip-description {
-  font-size: 14px;
+.tip-box :deep(.el-alert__description) {
   color: #d1d5db;
+  font-size: 14px;
   line-height: 1.6;
+  margin-top: 8px;
 }
 </style>

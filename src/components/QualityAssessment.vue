@@ -1,22 +1,24 @@
 <template>
-  <div class="quality-assessment-card">
-    <div class="card-header">
-      <div class="header-icon">📊</div>
-      <div class="header-text">
-        <h3 class="card-title">通信质量评估</h3>
-        <p class="card-subtitle">评估当前参数配置的通信质量</p>
+  <el-card class="quality-assessment-card" :body-style="{ padding: '24px' }">
+    <template #header>
+      <div class="card-header">
+        <div class="header-icon">📊</div>
+        <div class="header-text">
+          <h3 class="card-title">通信质量评估</h3>
+          <p class="card-subtitle">评估当前参数配置的通信质量</p>
+        </div>
+        <div class="header-actions">
+          <el-button type="info" @click="calculateQuality" class="action-btn secondary">
+            <span class="btn-icon">📈</span>
+            <span>计算评估</span>
+          </el-button>
+          <el-button type="success" @click="applyRecommendedConfig" class="action-btn primary">
+            <span class="btn-icon">✨</span>
+            <span>智能优化</span>
+          </el-button>
+        </div>
       </div>
-      <div class="header-actions">
-        <button class="action-btn secondary" @click="calculateQuality">
-          <span class="btn-icon">📈</span>
-          <span>计算评估</span>
-        </button>
-        <button class="action-btn primary" @click="applyRecommendedConfig">
-          <span class="btn-icon">✨</span>
-          <span>智能优化</span>
-        </button>
-      </div>
-    </div>
+    </template>
     <div class="assessment-result" v-if="showResult">
       <div class="result-section">
         <div class="result-header">
@@ -25,36 +27,20 @@
         </div>
         <div class="score-container">
           <div class="score-circle">
-            <svg class="progress-ring" width="180" height="180">
-              <circle
-                class="progress-ring-circle-bg"
-                cx="90"
-                cy="90"
-                r="75"
-              ></circle>
-              <circle
-                class="progress-ring-circle"
-                cx="90"
-                cy="90"
-                r="75"
-                :style="{ 
-                  strokeDasharray: `${circumference} ${circumference}`,
-                  strokeDashoffset: `${offset}`,
-                  stroke: `${scoreColor}`
-                }"
-              ></circle>
-            </svg>
-            <div class="score-inner">
-              <span class="score-value">{{ score }}</span>
-              <span class="score-unit">/100</span>
-            </div>
+            <el-progress
+              type="circle"
+              :percentage="score"
+              :color="scoreColor"
+              :width="180"
+              :stroke-width="8"
+            />
           </div>
           <div class="score-info">
             <h3>通信质量评分</h3>
-            <div class="score-level-badge" :class="`level-${scoreLevel.toLowerCase()}`">
+            <el-tag :type="scoreLevelType" class="score-level-badge">
               <span class="level-icon">{{ levelIcon }}</span>
               <span>{{ scoreLevel }}</span>
-            </div>
+            </el-tag>
           </div>
         </div>
       </div>
@@ -64,16 +50,18 @@
           <span class="section-icon">💡</span>
           <span class="section-title">优化建议</span>
         </div>
-        <div class="suggestions-list">
-          <div 
+        <el-list class="suggestions-list">
+          <el-list-item 
             v-for="(suggestion, index) in suggestions" 
             :key="index"
             class="suggestion-item"
           >
-            <span class="suggestion-icon">📌</span>
-            <span class="suggestion-text">{{ suggestion }}</span>
-          </div>
-        </div>
+            <template #prefix>
+              <span class="suggestion-icon">📌</span>
+            </template>
+            {{ suggestion }}
+          </el-list-item>
+        </el-list>
       </div>
       
       <div class="comparison-section" v-if="showComparison">
@@ -81,33 +69,22 @@
           <span class="section-icon">⚖️</span>
           <span class="section-title">配置对比</span>
         </div>
-        <div class="comparison-grid">
-          <div 
-            v-for="item in comparisonData" 
-            :key="item.param"
-            class="comparison-item"
-          >
-            <div class="comparison-label">{{ item.param }}</div>
-            <div class="comparison-values">
-              <div class="value-column">
-                <span class="value-label">当前</span>
-                <span class="value-current">{{ item.current }}</span>
-              </div>
-              <div class="value-divider">→</div>
-              <div class="value-column">
-                <span class="value-label">推荐</span>
-                <span class="value-recommended">{{ item.recommended }}</span>
-              </div>
-            </div>
-            <div class="comparison-status" :class="item.status.type">
-              <span class="status-icon">{{ item.status.icon }}</span>
-              <span class="status-text">{{ item.status.text }}</span>
-            </div>
-          </div>
-        </div>
+        <el-table :data="comparisonData" class="comparison-table">
+          <el-table-column prop="param" label="参数" width="120"></el-table-column>
+          <el-table-column prop="current" label="当前配置" width="150"></el-table-column>
+          <el-table-column prop="recommended" label="推荐配置" width="150"></el-table-column>
+          <el-table-column prop="status" label="状态">
+            <template #default="scope">
+              <el-tag :type="scope.row.status.type">
+                <span class="status-icon">{{ scope.row.status.icon }}</span>
+                <span class="status-text">{{ scope.row.status.text }}</span>
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
@@ -131,9 +108,6 @@ const score = ref(0)
 const suggestions = ref([])
 const comparisonData = ref([])
 
-const circumference = 2 * Math.PI * 75
-const offset = computed(() => circumference - (score.value / 100) * circumference)
-
 const scoreColor = computed(() => {
   if (score.value >= 80) return '#00ff88'
   if (score.value >= 60) return '#ffa500'
@@ -144,6 +118,12 @@ const scoreLevel = computed(() => {
   if (score.value >= 80) return '优秀'
   if (score.value >= 60) return '良好'
   return '较差'
+})
+
+const scoreLevelType = computed(() => {
+  if (score.value >= 80) return 'success'
+  if (score.value >= 60) return 'warning'
+  return 'danger'
 })
 
 const levelIcon = computed(() => {
@@ -448,15 +428,27 @@ window.qualityAssessmentRef = {
   background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid #1f2937;
   border-radius: 16px;
-  padding: 24px;
+  position: relative;
+  overflow: hidden;
   margin-bottom: 20px;
+}
+
+.quality-assessment-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #00d4ff 30%, #00ff88 70%, transparent 100%);
+  opacity: 0.5;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .header-icon {
@@ -499,14 +491,13 @@ window.qualityAssessmentRef = {
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
 }
 
 .action-btn.primary {
   background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
   color: #0a0e14;
+  border: none;
 }
 
 .action-btn.primary:hover {
@@ -559,48 +550,7 @@ window.qualityAssessmentRef = {
 }
 
 .score-circle {
-  position: relative;
   flex-shrink: 0;
-}
-
-.progress-ring {
-  transform: rotate(-90deg);
-}
-
-.progress-ring-circle-bg {
-  fill: none;
-  stroke: #1f2937;
-  stroke-width: 8;
-}
-
-.progress-ring-circle {
-  fill: none;
-  stroke-width: 8;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1s ease;
-}
-
-.score-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.score-value {
-  font-size: 48px;
-  font-weight: 800;
-  font-family: 'Courier New', monospace;
-  background: linear-gradient(90deg, #00ff88 0%, #00d4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.score-unit {
-  font-size: 18px;
-  color: #6b7280;
 }
 
 .score-info {
@@ -614,142 +564,64 @@ window.qualityAssessmentRef = {
 }
 
 .score-level-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
-}
-
-.score-level-badge.level-优秀 {
-  background: rgba(0, 255, 136, 0.15);
-  color: #00ff88;
-  border: 1px solid rgba(0, 255, 136, 0.3);
-}
-
-.score-level-badge.level-良好 {
-  background: rgba(255, 165, 0, 0.15);
-  color: #ffa500;
-  border: 1px solid rgba(255, 165, 0, 0.3);
-}
-
-.score-level-badge.level-较差 {
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff6b6b;
-  border: 1px solid rgba(255, 107, 107, 0.3);
+  padding: 10px 20px;
+  border-radius: 10px;
 }
 
 .level-icon {
   font-size: 18px;
+  margin-right: 8px;
 }
 
 .suggestions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .suggestion-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.8);
   padding: 14px 16px;
-  background: rgba(31, 41, 55, 0.4);
-  border-radius: 10px;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
 }
 
 .suggestion-icon {
   font-size: 18px;
-  margin-top: 2px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 
-.suggestion-text {
-  font-size: 14px;
-  color: #d1d5db;
-  line-height: 1.5;
-}
-
-.comparison-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.comparison-item {
+.comparison-table {
   background: rgba(31, 41, 55, 0.4);
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.comparison-label {
-  font-size: 12px;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
+.comparison-table :deep(.el-table__header-wrapper th) {
+  background: rgba(31, 41, 55, 0.8);
+  color: #e0e6ed;
+  border-bottom: 1px solid #374151;
 }
 
-.comparison-values {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.comparison-table :deep(.el-table__body-wrapper tr) {
+  background: transparent;
 }
 
-.value-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.comparison-table :deep(.el-table__body-wrapper tr:hover) {
+  background: rgba(31, 41, 55, 0.6);
 }
 
-.value-label {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.value-current {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.value-recommended {
-  font-size: 14px;
-  font-weight: 600;
-  color: #00ff88;
-}
-
-.value-divider {
-  font-size: 16px;
-  color: #374151;
-}
-
-.comparison-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.comparison-status.success {
-  background: rgba(0, 255, 136, 0.1);
-  color: #00ff88;
-}
-
-.comparison-status.warning {
-  background: rgba(255, 165, 0, 0.1);
-  color: #ffa500;
+.comparison-table :deep(.el-table__body-wrapper td) {
+  border-bottom: 1px solid rgba(31, 41, 55, 0.4);
+  color: #e0e6ed;
 }
 
 .status-icon {
-  font-size: 14px;
+  margin-right: 6px;
 }
 </style>
