@@ -1,89 +1,155 @@
 <template>
-  <el-card class="training-task-card" shadow="hover">
-    <template #header>
-      <div class="card-header">
-        <span>训练任务</span>
-        <el-button type="info" size="small" @click="backToTaskList" v-if="currentTask">返回任务列表</el-button>
+  <div class="training-task-page">
+    <!-- 页面头部 -->
+    <div class="page-header" v-if="!currentTask">
+      <div class="header-content">
+        <div class="header-badge">
+          <span class="badge-icon">⚔</span>
+          <span class="badge-text">作战任务</span>
+        </div>
+        <h1 class="page-title">战术任务中心</h1>
+        <p class="page-subtitle">选择任务并完成通信参数配置训练</p>
       </div>
-    </template>
+    </div>
+    
+    <!-- 任务详情返回按钮 -->
+    <div class="page-header compact" v-else>
+      <button class="back-button" @click="backToTaskList">
+        <span class="back-icon">←</span>
+        <span class="back-text">返回任务列表</span>
+      </button>
+    </div>
     
     <!-- 任务列表 -->
-    <div class="task-list" v-if="!currentTask">
-      <el-card 
-        v-for="task in tasks" 
-        :key="task.id"
-        class="task-item"
-        :class="{ 'task-completed': task.completed, 'task-in-progress': task.inProgress }"
-      >
-        <div class="task-header">
-          <div class="task-title">
-            <el-tag v-if="task.completed || task.inProgress" :type="task.statusType">{{ task.statusText }}</el-tag>
-            <h3>{{ task.title }}</h3>
+    <div class="task-list-container" v-if="!currentTask">
+      <div class="task-grid">
+        <div 
+          v-for="task in tasks" 
+          :key="task.id"
+          class="task-card"
+          :class="{ 
+            'task-completed': task.completed, 
+            'task-in-progress': task.inProgress 
+          }"
+        >
+          <div class="task-card-header">
+            <div class="task-id-badge">{{ String(task.id).padStart(2, '0') }}</div>
+            <div class="task-status" :class="'status-' + task.statusType">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ task.statusText }}</span>
+            </div>
           </div>
-          <el-button 
-            type="primary" 
-            size="small" 
-            @click="startTask(task.id)"
-            v-if="!task.completed && !task.inProgress"
-          >
-            开始任务
-          </el-button>
-          <el-button 
-            type="success" 
-            size="small" 
-            @click="completeTask(task.id)"
-            v-else-if="task.inProgress"
-          >
-            完成任务
-          </el-button>
-          <el-button 
-            type="info" 
-            size="small" 
-            @click="viewTask(task.id)"
-            v-else
-          >
-            查看详情
-          </el-button>
+          
+          <div class="task-card-body">
+            <h3 class="task-title">{{ task.title }}</h3>
+            <p class="task-description">{{ task.description }}</p>
+            
+            <div class="task-meta">
+              <div class="meta-item">
+                <span class="meta-icon">🎯</span>
+                <span class="meta-text">{{ task.target }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">💡</span>
+                <span class="meta-text">{{ task.hint }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="task-card-footer">
+            <button 
+              v-if="!task.completed && !task.inProgress"
+              class="action-button primary"
+              @click="startTask(task.id)"
+            >
+              <span class="button-text">开始任务</span>
+              <span class="button-arrow">→</span>
+            </button>
+            <button 
+              v-else-if="task.inProgress"
+              class="action-button success"
+              @click="viewTask(task.id)"
+            >
+              <span class="button-text">继续任务</span>
+              <span class="button-arrow">→</span>
+            </button>
+            <button 
+              v-else
+              class="action-button secondary"
+              @click="viewTask(task.id)"
+            >
+              <span class="button-text">查看详情</span>
+              <span class="button-arrow">→</span>
+            </button>
+          </div>
         </div>
-        <div class="task-content">
-          <p class="task-description">{{ task.description }}</p>
-          <p class="task-target">目标：{{ task.target }}</p>
-          <p class="task-hint">提示：{{ task.hint }}</p>
-        </div>
-      </el-card>
+      </div>
     </div>
     
     <!-- 任务详情 -->
-    <div class="task-detail" v-if="currentTask">
-      <el-card class="detail-card">
-        <div class="detail-header">
-          <h2>{{ currentTask.title }}</h2>
-          <el-tag v-if="currentTask.completed || currentTask.inProgress" :type="currentTask.statusType">{{ currentTask.statusText }}</el-tag>
-        </div>
-        <div class="detail-content">
-          <el-divider>任务描述</el-divider>
-          <p>{{ currentTask.description }}</p>
-          
-          <el-divider>任务目标</el-divider>
-          <p>{{ currentTask.target }}</p>
-          
-          <el-divider>任务提示</el-divider>
-          <p>{{ currentTask.hint }}</p>
-          
-          <el-divider>推荐配置</el-divider>
-          <el-table :data="currentTask.recommendedConfig" style="width: 100%">
-            <el-table-column prop="param" label="参数" width="120"></el-table-column>
-            <el-table-column prop="value" label="推荐值"></el-table-column>
-          </el-table>
-          
-          <el-divider>操作</el-divider>
-          <div class="detail-actions">
-            <el-button type="primary" @click="navigateToParamConfig">前往参数配置</el-button>
+    <div class="task-detail-container" v-if="currentTask">
+      <div class="detail-main">
+        <div class="detail-header-section">
+          <div class="detail-id-badge">任务 {{ String(currentTask.id).padStart(2, '0') }}</div>
+          <h2 class="detail-title">{{ currentTask.title }}</h2>
+          <div class="detail-status" :class="'status-' + currentTask.statusType">
+            <span class="status-dot"></span>
+            <span class="status-text">{{ currentTask.statusText }}</span>
           </div>
         </div>
-      </el-card>
+        
+        <div class="detail-content">
+          <div class="info-section">
+            <div class="section-title">
+              <span class="title-icon">📋</span>
+              <span>任务描述</span>
+            </div>
+            <p class="section-text">{{ currentTask.description }}</p>
+          </div>
+          
+          <div class="info-section">
+            <div class="section-title">
+              <span class="title-icon">🎯</span>
+              <span>任务目标</span>
+            </div>
+            <p class="section-text">{{ currentTask.target }}</p>
+          </div>
+          
+          <div class="info-section">
+            <div class="section-title">
+              <span class="title-icon">💡</span>
+              <span>任务提示</span>
+            </div>
+            <p class="section-text">{{ currentTask.hint }}</p>
+          </div>
+          
+          <div class="info-section">
+            <div class="section-title">
+              <span class="title-icon">⚙️</span>
+              <span>推荐配置</span>
+            </div>
+            <div class="config-grid">
+              <div v-for="config in currentTask.recommendedConfig" :key="config.param" class="config-item">
+                <div class="config-label">{{ config.param }}</div>
+                <div class="config-value">{{ config.value }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-actions">
+          <button class="main-action-button" @click="navigateToParamConfig">
+            <span class="button-icon">🚀</span>
+            <span class="button-text">前往参数配置</span>
+          </button>
+          <button v-if="currentTask.inProgress" class="complete-button" @click="completeCurrentTask">
+            <span class="button-icon">✓</span>
+            <span class="button-text">标记完成</span>
+          </button>
+        </div>
+      </div>
     </div>
-  </el-card>
+  </div>
 </template>
 
 <script setup>
@@ -101,7 +167,7 @@ const loadTasksFromStorage = () => {
         if (savedTask) {
           task.completed = savedTask.completed
           task.inProgress = false // 确保刷新后不会保持进行中状态
-          task.statusType = savedTask.completed ? 'success' : 'danger'
+          task.statusType = savedTask.completed ? 'success' : 'default'
           task.statusText = savedTask.completed ? '已完成' : '未完成'
         }
       })
@@ -143,10 +209,10 @@ const tasks = ref([
       { param: '功率', value: '7-8' },
       { param: '抗干扰模式', value: '自适应调频' }
     ],
-    environment: 'mountain', // 山地环境
+    environment: 'mountain',
     completed: false,
     inProgress: false,
-    statusType: 'danger',
+    statusType: 'default',
     statusText: '未完成'
   },
   {
@@ -161,10 +227,10 @@ const tasks = ref([
       { param: '功率', value: '8-9' },
       { param: '抗干扰模式', value: '自适应调频' }
     ],
-    environment: 'interference', // 强干扰环境
+    environment: 'interference',
     completed: false,
     inProgress: false,
-    statusType: 'danger',
+    statusType: 'default',
     statusText: '未完成'
   },
   {
@@ -179,10 +245,10 @@ const tasks = ref([
       { param: '功率', value: '5-6' },
       { param: '抗干扰模式', value: '纠错编码' }
     ],
-    environment: 'city', // 城市环境
+    environment: 'city',
     completed: false,
     inProgress: false,
-    statusType: 'danger',
+    statusType: 'default',
     statusText: '未完成'
   },
   {
@@ -197,10 +263,10 @@ const tasks = ref([
       { param: '功率', value: '2-3' },
       { param: '抗干扰模式', value: '纠错编码' }
     ],
-    environment: 'city', // 城市环境（侦察任务通常在城市或复杂地形）
+    environment: 'city',
     completed: false,
     inProgress: false,
-    statusType: 'danger',
+    statusType: 'default',
     statusText: '未完成'
   }
 ])
@@ -214,23 +280,11 @@ const startTask = (taskId) => {
     task.statusType = 'warning'
     task.statusText = '进行中'
     currentTask.value = task
-    // 设置当前任务信息到全局
     window.currentTask = task
     window.currentTaskId = taskId
-    // 隐藏侧边栏
     if (window.hideSidebar) {
       window.hideSidebar()
     }
-  }
-}
-
-const completeTask = (taskId) => {
-  const task = tasks.value.find(t => t.id === taskId)
-  if (task) {
-    task.completed = true
-    task.inProgress = false
-    task.statusType = 'success'
-    task.statusText = '已完成'
   }
 }
 
@@ -238,30 +292,29 @@ const viewTask = (taskId) => {
   const task = tasks.value.find(t => t.id === taskId)
   if (task) {
     currentTask.value = task
+    if (window.hideSidebar) {
+      window.hideSidebar()
+    }
   }
 }
 
 const backToTaskList = () => {
-  // 确保退出任务时任务状态不会变为已完成
   if (currentTask.value) {
     const task = tasks.value.find(t => t.id === currentTask.value.id)
-    if (task) {
+    if (task && !task.completed) {
       task.inProgress = false
-      task.statusType = 'danger'
+      task.statusType = 'default'
       task.statusText = '未完成'
     }
   }
-  // 清除全局任务信息
   window.currentTask = null
   window.currentTaskId = null
   currentTask.value = null
-  // 显示侧边栏
   if (window.showSidebar) {
     window.showSidebar()
   }
 }
 
-// 完成当前任务
 const completeCurrentTask = () => {
   if (currentTask.value) {
     const task = tasks.value.find(t => t.id === currentTask.value.id)
@@ -272,33 +325,27 @@ const completeCurrentTask = () => {
       task.statusText = '已完成'
     }
   }
-  // 排序任务：未完成的任务在前，已完成的任务在后
   tasks.value.sort((a, b) => {
     if (a.completed && !b.completed) return 1
     if (!a.completed && b.completed) return -1
     return 0
   })
-  // 更新统计数据
   const completedCount = tasks.value.filter(t => t.completed).length
   if (window.updateTaskStats) {
     window.updateTaskStats(completedCount)
   }
-  // 保存到localStorage
   saveTasksToStorage()
   backToTaskList()
 }
 
-// 暴露完成任务函数到全局
 window.completeCurrentTask = completeCurrentTask
 
 const navigateToParamConfig = () => {
-  // 触发父组件切换到参数配置页面，并设置对应的环境
   if (window.switchToParamConfig && currentTask.value) {
     window.switchToParamConfig(currentTask.value.environment)
   }
 }
 
-// 组件初始化时加载任务状态
 onMounted(() => {
   loadTasksFromStorage()
 })
@@ -306,75 +353,483 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.training-task-card {
-  margin-bottom: 20px;
+.training-task-page {
+  padding: 0;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
+/* 页面头部 */
+.page-header {
+  margin-bottom: 40px;
+}
+
+.page-header.compact {
+  margin-bottom: 30px;
+}
+
+.header-content {
+  text-align: left;
+}
+
+.header-badge {
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.2);
+  border-radius: 50px;
+  margin-bottom: 16px;
 }
 
-.task-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.badge-icon {
+  color: #ffa500;
+  font-size: 14px;
 }
 
-.task-item {
-  border-left: 4px solid #e4e7ed;
+.badge-text {
+  font-size: 11px;
+  color: #ffa500;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: 2px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(31, 41, 55, 0.5);
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  color: #e0e6ed;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.task-item.task-completed {
-  border-left-color: #67C23A;
-  background-color: #f0f9eb;
+.back-button:hover {
+  background: rgba(31, 41, 55, 0.8);
+  border-color: #374151;
 }
 
-.task-item.task-in-progress {
-  border-left-color: #E6A23C;
-  background-color: #fdf6ec;
+.back-icon {
+  font-size: 18px;
 }
 
-.task-header {
+/* 任务列表 */
+.task-list-container {
+  max-width: 1200px;
+}
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.task-card {
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #00ff88 0%, #00d4ff 100%);
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-4px);
+  border-color: #374151;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.task-card:hover::before {
+  opacity: 0.6;
+}
+
+.task-card.task-completed {
+  opacity: 0.7;
+}
+
+.task-card.task-completed::before {
+  background: #00ff88;
+}
+
+.task-card.task-in-progress::before {
+  background: #ffa500;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.task-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.task-id-badge {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 212, 255, 0.15) 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  color: #00ff88;
+}
+
+.task-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.status-default {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.status-success {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+}
+
+.status-warning {
+  background: rgba(255, 165, 0, 0.15);
+  color: #ffa500;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-warning .status-dot {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.task-card-body {
+  flex: 1;
+  margin-bottom: 20px;
 }
 
 .task-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.task-title h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.task-content {
-  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
 }
 
 .task-description {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  color: #606266;
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
 }
 
-.task-target {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  color: #606266;
+.task-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.task-hint {
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.meta-icon {
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+.meta-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.task-card-footer {
+  padding-top: 16px;
+  border-top: 1px solid #1f2937;
+}
+
+.action-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+  color: #0a0e14;
+}
+
+.action-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
+}
+
+.action-button.success {
+  background: linear-gradient(135deg, #ffa500 0%, #cc8400 100%);
+  color: #0a0e14;
+}
+
+.action-button.success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 165, 0, 0.3);
+}
+
+.action-button.secondary {
+  background: rgba(31, 41, 55, 0.6);
+  color: #e0e6ed;
+  border: 1px solid #1f2937;
+}
+
+.action-button.secondary:hover {
+  background: rgba(31, 41, 55, 0.9);
+  border-color: #374151;
+}
+
+.button-arrow {
+  transition: transform 0.3s ease;
+}
+
+.action-button:hover .button-arrow {
+  transform: translateX(4px);
+}
+
+/* 任务详情 */
+.task-detail-container {
+  max-width: 900px;
+}
+
+.detail-main {
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 20px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #00ff88 20%, #00d4ff 50%, #00ff88 80%, transparent 100%);
+}
+
+.detail-header-section {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.detail-id-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 212, 255, 0.2) 100%);
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  color: #00ff88;
+  margin-bottom: 16px;
+}
+
+.detail-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  letter-spacing: 1px;
+}
+
+.detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.detail-content {
+  margin-bottom: 36px;
+}
+
+.info-section {
+  margin-bottom: 28px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.title-icon {
+  font-size: 16px;
+}
+
+.section-text {
+  font-size: 14px;
+  color: #d1d5db;
+  line-height: 1.7;
   margin: 0;
+  padding-left: 26px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding-left: 26px;
+}
+
+.config-item {
+  background: rgba(31, 41, 55, 0.5);
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.config-value {
   font-size: 14px;
-  color: #909399;
+  color: #00ff88;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 28px;
+  border-top: 1px solid #1f2937;
+}
+
+.main-action-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a0e14;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.main-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.35);
+}
+
+.complete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #00ff88;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.complete-button:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.button-icon {
+  font-size: 18px;
 }
 </style>
