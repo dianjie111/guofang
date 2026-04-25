@@ -34,10 +34,7 @@
               <span class="menu-icon">📚</span>
               <span>战术库</span>
             </el-menu-item>
-            <el-menu-item index="system-settings">
-              <span class="menu-icon">⚙️</span>
-              <span>系统设置</span>
-            </el-menu-item>
+
           </el-menu>
         </div>
         <div class="sidebar-footer">
@@ -107,10 +104,7 @@
             <div v-else-if="activeMenu === 'knowledge-base'" class="page-transition">
               <KnowledgeBase />
             </div>
-            <!-- 系统设置 -->
-            <div v-else-if="activeMenu === 'system-settings'" class="page-transition">
-              <SystemSettings />
-            </div>
+
           </div>
         </el-main>
         <el-footer height="50px" class="footer">
@@ -136,7 +130,7 @@ import HistoryRecord from './components/HistoryRecord.vue'
 import TrainingTask from './components/TrainingTask.vue'
 import TrainingReport from './components/TrainingReport.vue'
 import KnowledgeBase from './components/KnowledgeBase.vue'
-import SystemSettings from './components/SystemSettings.vue'
+
 import HomePage from './components/HomePage.vue'
 
 const paramConfigRef = ref(null)

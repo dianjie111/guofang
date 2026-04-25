@@ -443,7 +443,7 @@ const caseKnowledge = [
   gap: 16px;
   margin-bottom: 28px;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  background: #0a0e17;
   border: 1px solid #1f2937;
   border-radius: 16px;
 }
@@ -479,7 +479,7 @@ const caseKnowledge = [
 }
 
 .knowledge-card {
-  background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
+  background: #0a0e17;
   border: 1px solid #1f2937;
   border-radius: 16px;
   padding: 24px;

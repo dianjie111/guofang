@@ -185,6 +185,9 @@ onMounted(() => {
 <style scoped>
 .training-report-card {
   margin-bottom: 20px;
+  background: #0a0e17;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
 }
 
 .card-header {
@@ -199,25 +202,30 @@ onMounted(() => {
 
 .report-card {
   margin-bottom: 20px;
+  background: #0a0e17;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
 }
 
 .stat-item {
   text-align: center;
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: rgba(31, 41, 55, 0.5);
   border-radius: 8px;
+  border: 1px solid #1f2937;
 }
 
 .stat-value {
   font-size: 24px;
   font-weight: bold;
-  color: #1890ff;
+  color: #00ff88;
   margin-bottom: 5px;
+  font-family: 'Courier New', monospace;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #606266;
+  color: #6b7280;
 }
 
 .progress-chart {
@@ -233,8 +241,8 @@ onMounted(() => {
 .chart-axis {
   height: 100%;
   position: relative;
-  border-left: 2px solid #e4e7ed;
-  border-bottom: 2px solid #e4e7ed;
+  border-left: 2px solid #1f2937;
+  border-bottom: 2px solid #1f2937;
   margin: 20px;
 }
 
@@ -249,7 +257,7 @@ onMounted(() => {
 
 .x-axis span {
   font-size: 12px;
-  color: #909399;
+  color: #6b7280;
 }
 
 .y-axis {
@@ -264,7 +272,7 @@ onMounted(() => {
 
 .y-axis span {
   font-size: 12px;
-  color: #909399;
+  color: #6b7280;
 }
 
 .chart-data {
@@ -284,9 +292,10 @@ onMounted(() => {
   position: absolute;
   width: 10px;
   height: 10px;
-  background-color: #1890ff;
+  background-color: #00ff88;
   border-radius: 50%;
   transform: translate(-50%, 50%);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
 .data-label {
@@ -295,7 +304,7 @@ onMounted(() => {
   left: 50%;
   transform: translateX(-50%);
   font-size: 12px;
-  color: #606266;
+  color: #6b7280;
   white-space: nowrap;
 }
 
@@ -307,8 +316,31 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   background: linear-gradient(to bottom, 
-    rgba(24, 144, 255, 0.1) 0%, 
-    rgba(24, 144, 255, 0) 100%);
+    rgba(0, 255, 136, 0.1) 0%, 
+    rgba(0, 255, 136, 0) 100%);
   clip-path: polygon(0 100%, 20% 30%, 40% 20%, 60% 40%, 80% 25%, 100% 15%, 100% 100%);
+}
+
+:deep(.el-table) {
+  background: transparent !important;
+}
+
+:deep(.el-table__header-wrapper th) {
+  background: rgba(31, 41, 55, 0.8) !important;
+  color: #e0e6ed !important;
+  border-bottom: 1px solid #1f2937 !important;
+}
+
+:deep(.el-table__body-wrapper tr) {
+  background: transparent !important;
+}
+
+:deep(.el-table__body-wrapper tr:hover) {
+  background: rgba(31, 41, 55, 0.6) !important;
+}
+
+:deep(.el-table__body-wrapper td) {
+  border-bottom: 1px solid rgba(31, 41, 55, 0.4) !important;
+  color: #e0e6ed !important;
 }
 </style>

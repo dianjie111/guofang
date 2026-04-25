@@ -86,7 +86,7 @@ watch(
 
 <style scoped>
 .knowledge-tip-card {
-  background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(10, 14, 20, 0.98) 100%);
+  background: #0a0e17;
   border: 1px solid #1f2937;
   border-radius: 16px;
   position: relative;
