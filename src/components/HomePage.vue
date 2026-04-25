@@ -1,128 +1,206 @@
 <template>
   <div class="home-page">
-    <div class="home-header">
-      <h1>📻 野战通信参数配置训练模拟器</h1>
-      <p class="subtitle">科技守卫家园 · 军事通信模拟训练系统</p>
+    <!-- 顶部英雄区域 -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <el-card class="hero-badge" :body-style="{ padding: '8px 16px', borderRadius: '50px' }">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge-icon">◆</span>
+            <span class="badge-text">战术指挥中心</span>
+          </div>
+        </el-card>
+        <h1 class="hero-title">
+          <span class="title-line">野战通信</span>
+          <span class="title-line accent">参数配置训练</span>
+        </h1>
+        <p class="hero-subtitle">
+          科技守卫家园 · 军事通信模拟训练系统
+        </p>
+      </div>
+      <div class="hero-decoration">
+        <div class="grid-pattern"></div>
+        <div class="glow-circle"></div>
+      </div>
     </div>
     
     <div class="home-content">
       <!-- 快速开始训练 -->
-      <el-card class="quick-start-card">
-        <template #header>
-          <span>⚡ 快速开始训练</span>
-        </template>
-        <div class="quick-start-content">
+      <div class="section-wrapper">
+        <div class="section-header">
+          <div class="section-title-block">
+            <span class="section-number">01</span>
+            <h2 class="section-title">快速部署</h2>
+          </div>
+          <div class="section-line"></div>
+        </div>
+        <el-card class="quick-start-card" :body-style="{ padding: '32px' }">
           <p class="quick-desc">选择战场环境，立即体验通信参数配置</p>
           <div class="environment-cards">
-            <div 
+            <el-card 
               v-for="env in environments" 
               :key="env.value"
               class="env-card"
               :class="{ active: selectedEnv === env.value }"
               @click="selectEnv(env.value)"
+              :body-style="{ padding: '28px 24px', textAlign: 'center' }"
             >
-              <div class="env-icon" :style="{ backgroundColor: env.color }">
-                {{ env.icon }}
+              <div class="env-background" :style="{ background: env.gradient }"></div>
+              <div class="env-content">
+                <div class="env-icon">{{ env.icon }}</div>
+                <div class="env-name">{{ env.name }}</div>
+                <el-tag class="env-tag" size="small">{{ env.tag }}</el-tag>
               </div>
-              <div class="env-name">{{ env.name }}</div>
-            </div>
+            </el-card>
           </div>
-          <el-button type="primary" size="large" @click="startTraining" class="start-btn">
-            开始训练
+          <el-button class="start-btn" @click="startTraining" type="primary" round>
+            <span class="btn-text">开始训练</span>
+            <span class="btn-arrow">→</span>
           </el-button>
-        </div>
-      </el-card>
+        </el-card>
+      </div>
       
       <!-- 平台统计 -->
-      <el-card class="stats-card">
-        <template #header>
-          <span>📊 平台统计</span>
-        </template>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="stat-item">
-              <div class="stat-icon">🎯</div>
-              <div class="stat-info">
-                <div class="stat-value">{{ taskStats.total }}</div>
-                <div class="stat-label">训练任务</div>
-                <div class="stat-detail">待完成: {{ taskStats.pending }}个 / 已完成: {{ taskStats.completed }}个</div>
+      <div class="section-wrapper">
+        <div class="section-header">
+          <div class="section-title-block">
+            <span class="section-number">02</span>
+            <h2 class="section-title">作战数据</h2>
+          </div>
+          <div class="section-line"></div>
+        </div>
+        <div class="stats-grid">
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <span class="stat-icon">🎯</span>
               </div>
+              <span class="stat-label">训练任务</span>
             </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="stat-item">
-              <div class="stat-icon">🏆</div>
-              <div class="stat-info">
-                <div class="stat-value">{{ bestScores.best || '--' }}分</div>
-                <div class="stat-label">最佳场景</div>
-                <div class="stat-detail">山地: {{ bestScores.mountain || '--' }}分 / 城市: {{ bestScores.city || '--' }}分 / 干扰: {{ bestScores.interference || '--' }}分</div>
+            <div class="stat-value">{{ taskStats.total }}</div>
+            <div class="stat-detail">
+              <span class="detail-item pending">待完成: {{ taskStats.pending }}</span>
+              <span class="detail-divider">/</span>
+              <span class="detail-item completed">已完成: {{ taskStats.completed }}</span>
+            </div>
+          </el-card>
+          
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper accent">
+                <span class="stat-icon">🏆</span>
               </div>
+              <span class="stat-label">最佳场景</span>
             </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="stat-item">
-              <div class="stat-icon">📈</div>
-              <div class="stat-info">
-                <div class="stat-value">{{ passRate }}%</div>
-                <div class="stat-label">综合通过率</div>
-                <div class="stat-detail">
-                  <el-progress :percentage="passRate" :color="passRateColor" :show-text="false"></el-progress>
+            <div class="stat-value accent">{{ bestScores.best || '--' }}<span class="value-unit">分</span></div>
+            <div class="stat-detail scores">
+              <span>山地: {{ bestScores.mountain || '--' }}</span>
+              <span>城市: {{ bestScores.city || '--' }}</span>
+              <span>干扰: {{ bestScores.interference || '--' }}</span>
+            </div>
+          </el-card>
+          
+          <el-card class="stat-card" :body-style="{ padding: '28px' }">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper success">
+                <span class="stat-icon">📈</span>
+              </div>
+              <span class="stat-label">综合通过率</span>
+            </div>
+            <div class="stat-value success">{{ passRate }}<span class="value-unit">%</span></div>
+            <div class="stat-progress">
+              <el-progress 
+                :percentage="passRate" 
+                :color="passRateColor" 
+                :stroke-width="6" 
+                :text-inside="false" 
+                show-text="false"
+              />
+            </div>
+          </el-card>
+        </div>
+      </div>
+      
+      <div class="two-column-layout">
+        <!-- 推荐训练 -->
+        <div class="column section-wrapper">
+          <div class="section-header compact">
+            <div class="section-title-block">
+              <span class="section-number small">03</span>
+              <h2 class="section-title small">推荐任务</h2>
+            </div>
+          </div>
+          <div class="task-list">
+            <el-card 
+              v-for="(task, index) in recommendTasks" 
+              :key="task.id"
+              class="task-item"
+              @click="goToTask(task.id)"
+              :body-style="{ padding: '20px' }"
+            >
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <el-tag 
+                  class="task-level" 
+                  :class="'level-' + task.level"
+                  size="small"
+                >
+                  {{ task.levelText }}
+                </el-tag>
+                <div class="task-info">
+                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-desc">{{ task.description }}</div>
+                </div>
+                <div class="task-action">
+                  <span class="action-icon">▶</span>
                 </div>
               </div>
-            </div>
-          </el-col>
-        </el-row>
-      </el-card>
-      
-      <!-- 推荐训练 -->
-      <el-card class="recommend-task-card">
-        <template #header>
-          <span>🎯 推荐训练</span>
-        </template>
-        <div class="task-list">
-          <div 
-            v-for="(task, index) in recommendTasks" 
-            :key="task.id"
-            class="task-item"
-            @click="goToTask(task.id)"
-          >
-            <div class="task-level" :class="'level-' + task.level">
-              {{ task.levelText }}
-            </div>
-            <div class="task-info">
-              <div class="task-title">{{ task.title }}</div>
-              <div class="task-desc">{{ task.description }}</div>
-            </div>
-            <div class="task-action">
-              <span>开始挑战 →</span>
-            </div>
+            </el-card>
           </div>
         </div>
-      </el-card>
-      
-      <!-- 今日推荐 -->
-      <el-card class="today-recommend-card">
-        <template #header>
-          <span>📚 今日推荐</span>
-        </template>
-        <div class="knowledge-list">
-          <div 
-            v-for="item in knowledgeArticles" 
-            :key="item.id"
-            class="knowledge-item"
-            @click="goToKnowledge(item.tab, item.id)"
-          >
-            <div class="knowledge-icon">💡</div>
-            <div class="knowledge-title">{{ item.title }}</div>
-            <div class="knowledge-action">阅读全文 →</div>
+        
+        <!-- 今日推荐 -->
+        <div class="column section-wrapper">
+          <div class="section-header compact">
+            <div class="section-title-block">
+              <span class="section-number small">04</span>
+              <h2 class="section-title small">战术知识库</h2>
+            </div>
+          </div>
+          <div class="knowledge-list">
+            <el-card 
+              v-for="item in knowledgeArticles" 
+              :key="item.id"
+              class="knowledge-item"
+              @click="goToKnowledge(item.tab, item.id)"
+              :body-style="{ padding: '20px' }"
+            >
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="knowledge-icon">
+                  <span>💡</span>
+                </div>
+                <div class="knowledge-content">
+                  <div class="knowledge-title">{{ item.title }}</div>
+                </div>
+                <div class="knowledge-action">
+                  <span class="action-arrow">→</span>
+                </div>
+              </div>
+            </el-card>
           </div>
         </div>
-      </el-card>
+      </div>
       
       <!-- 历史记录 -->
-      <div class="history-record-section">
-        <h3>📋 历史记录</h3>
-        <HistoryRecord ref="historyRecordRef" />
+      <div class="section-wrapper history-section">
+        <div class="section-header">
+          <div class="section-title-block">
+            <span class="section-number">05</span>
+            <h2 class="section-title">作战日志</h2>
+          </div>
+          <div class="section-line"></div>
+        </div>
+        <el-card class="history-wrapper" :body-style="{ padding: '24px' }">
+          <HistoryRecord ref="historyRecordRef" />
+        </el-card>
       </div>
     </div>
   </div>
@@ -135,7 +213,6 @@ import HistoryRecord from './HistoryRecord.vue'
 const historyRecordRef = ref(null)
 
 onMounted(() => {
-  // 暴露给全局
   window.historyRecordRef = historyRecordRef.value
 })
 
@@ -146,12 +223,29 @@ onUnmounted(() => {
 const selectedEnv = ref('mountain')
 
 const environments = [
-  { value: 'mountain', name: '山地环境', icon: '🏔️', color: '#4CAF50' },
-  { value: 'city', name: '城市环境', icon: '🏙️', color: '#9E9E9E' },
-  { value: 'interference', name: '强干扰环境', icon: '⚡', color: '#F44336' }
+  { 
+    value: 'mountain', 
+    name: '山地环境', 
+    icon: '🏔️', 
+    gradient: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 50%, #009950 100%)',
+    tag: '远距离'
+  },
+  { 
+    value: 'city', 
+    name: '城市环境', 
+    icon: '🏙️', 
+    gradient: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #006699 100%)',
+    tag: '高穿透'
+  },
+  { 
+    value: 'interference', 
+    name: '强干扰环境', 
+    icon: '⚡', 
+    gradient: 'linear-gradient(135deg, #ff6b6b 0%, #cc5555 50%, #993333 100%)',
+    tag: '抗干扰'
+  }
 ]
 
-// 从localStorage读取平台统计数据
 const loadStatsFromStorage = () => {
   try {
     const storedStats = localStorage.getItem('trainingStats')
@@ -165,7 +259,6 @@ const loadStatsFromStorage = () => {
   }
 }
 
-// 保存平台统计数据到localStorage
 const saveStatsToStorage = () => {
   try {
     const statsToSave = {
@@ -178,14 +271,12 @@ const saveStatsToStorage = () => {
   }
 }
 
-// 更新任务统计数据
 const updateTaskStats = (completedCount) => {
   taskStats.value.completed = completedCount
   taskStats.value.pending = taskStats.value.total - completedCount
   saveStatsToStorage()
 }
 
-// 更新最佳成绩
 const updateBestScore = (environment, score) => {
   if (score > bestScores.value[environment]) {
     bestScores.value[environment] = score
@@ -194,7 +285,6 @@ const updateBestScore = (environment, score) => {
   }
 }
 
-// 暴露更新函数到全局
 window.updateTaskStats = updateTaskStats
 window.updateBestScore = updateBestScore
 
@@ -211,7 +301,6 @@ const bestScores = ref({
   interference: 0
 })
 
-// 组件初始化时加载统计数据
 onMounted(() => {
   loadStatsFromStorage()
 })
@@ -221,9 +310,9 @@ const passRate = computed(() => {
 })
 
 const passRateColor = computed(() => {
-  if (passRate.value >= 80) return '#67C23A'
-  if (passRate.value >= 60) return '#E6A23C'
-  return '#F56C6C'
+  if (passRate.value >= 80) return '#00ff88'
+  if (passRate.value >= 60) return '#ffa500'
+  return '#ff6b6b'
 })
 
 const recommendTasks = ref([
@@ -260,21 +349,18 @@ const selectEnv = (env) => {
 }
 
 const startTraining = () => {
-  // 跳转到参数配置页面，并传递选中的环境
   if (window.switchToParamConfig) {
     window.switchToParamConfig(selectedEnv.value)
   }
 }
 
 const goToTask = (taskId) => {
-  // 跳转到训练任务页面并选中对应任务
   if (window.goToTask) {
     window.goToTask(taskId)
   }
 }
 
 const goToKnowledge = (tab, articleId) => {
-  // 跳转到知识库对应文章
   if (window.goToKnowledge) {
     window.goToKnowledge(tab, articleId)
   }
@@ -283,247 +369,584 @@ const goToKnowledge = (tab, articleId) => {
 
 <style scoped>
 .home-page {
-  padding: 20px;
+  padding: 0;
 }
 
-.home-header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 20px 0;
+/* 英雄区域 */
+.hero-section {
+  position: relative;
+  padding: 40px 0 50px;
+  margin-bottom: 40px;
+  overflow: hidden;
 }
 
-.home-header h1 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #303133;
-  margin: 0 0 10px 0;
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 
-.subtitle {
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 50px;
+  margin-bottom: 24px;
+}
+
+.badge-icon {
+  color: #00ff88;
+  font-size: 14px;
+}
+
+.badge-text {
+  font-size: 12px;
+  color: #00ff88;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.hero-title {
+  margin: 0 0 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title-line {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  line-height: 1.1;
+}
+
+.title-line.accent {
+  background: linear-gradient(90deg, #00ff88 0%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
   font-size: 16px;
-  color: #909399;
+  color: #6b7280;
   margin: 0;
+  letter-spacing: 1px;
 }
 
+.hero-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.grid-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 400px;
+  background-image: 
+    linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: rotate(45deg);
+}
+
+.glow-circle {
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+  transform: translateY(-50%);
+}
+
+/* 通用布局 */
 .home-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-.home-content .el-card {
-  margin-bottom: 20px;
+.section-wrapper {
+  margin-bottom: 40px;
 }
 
-/* 快速开始训练 */
-.quick-start-content {
-  text-align: center;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.section-header.compact {
+  margin-bottom: 16px;
+}
+
+.section-title-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.section-number {
+  font-size: 14px;
+  font-weight: 800;
+  color: #00ff88;
+  font-family: 'Courier New', monospace;
+}
+
+.section-number.small {
+  font-size: 12px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+.section-title.small {
+  font-size: 16px;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, #1f2937 0%, transparent 100%);
+}
+
+/* 快速开始 */
+.quick-start-card {
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-start-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #00ff88 20%, #00d4ff 50%, #00ff88 80%, transparent 100%);
 }
 
 .quick-desc {
   font-size: 14px;
-  color: #606266;
-  margin-bottom: 20px;
+  color: #9ca3af;
+  margin-bottom: 28px;
+  text-align: center;
 }
 
 .environment-cards {
   display: flex;
   justify-content: center;
-  gap: 30px;
-  margin-bottom: 30px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
 .env-card {
+  position: relative;
   cursor: pointer;
-  padding: 20px;
-  border: 2px solid #e4e7ed;
-  border-radius: 12px;
-  transition: all 0.3s ease;
   text-align: center;
-  width: 120px;
+  width: 160px;
+  background: rgba(31, 41, 55, 0.5);
+  border: 2px solid #1f2937;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.env-card:hover {
-  border-color: #409EFF;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.env-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.env-card:hover .env-background {
+  opacity: 0.1;
 }
 
 .env-card.active {
-  border-color: #409EFF;
-  background-color: #ecf5ff;
+  border-color: #00ff88;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.2);
+}
+
+.env-card.active .env-background {
+  opacity: 0.15;
+}
+
+.env-content {
+  position: relative;
+  z-index: 2;
 }
 
 .env-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-  font-size: 28px;
+  font-size: 40px;
+  margin-bottom: 12px;
 }
 
 .env-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.env-tag {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border: none;
+  border-radius: 50px;
+  font-size: 11px;
+  letter-spacing: 1px;
 }
 
 .start-btn {
-  width: 200px;
-  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 240px;
+  height: 56px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+  border: none;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: 700;
+  color: #0a0e14;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 2px;
 }
 
-/* 平台统计 */
-.stat-item {
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.4);
+}
+
+.btn-arrow {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.start-btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* 统计卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #00ff88;
+  opacity: 0.5;
+}
+
+.stat-header {
   display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  padding: 15px;
-  background-color: #f5f7fa;
-  border-radius: 8px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-wrapper.accent {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.stat-icon-wrapper.success {
+  background: rgba(102, 194, 58, 0.1);
 }
 
 .stat-icon {
-  font-size: 32px;
-}
-
-.stat-info {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: bold;
-  color: #1890ff;
-  line-height: 1;
+  font-size: 24px;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #606266;
-  margin-top: 5px;
+  font-size: 13px;
+  color: #6b7280;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 16px;
+  font-family: 'Courier New', monospace;
+}
+
+.stat-value.accent {
+  color: #00d4ff;
+}
+
+.stat-value.success {
+  color: #00ff88;
+}
+
+.value-unit {
+  font-size: 20px;
+  margin-left: 4px;
 }
 
 .stat-detail {
   font-size: 12px;
-  color: #909399;
-  margin-top: 5px;
+  color: #6b7280;
 }
 
-/* 推荐训练 */
+.detail-item.pending {
+  color: #ffa500;
+}
+
+.detail-item.completed {
+  color: #00ff88;
+}
+
+.detail-divider {
+  margin: 0 6px;
+  color: #374151;
+}
+
+.stat-detail.scores {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-progress {
+  margin-top: 8px;
+}
+
+/* 两列布局 */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.column {
+  margin-bottom: 0;
+}
+
+/* 任务列表 */
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .task-item {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .task-item:hover {
-  border-color: #409EFF;
-  background-color: #ecf5ff;
+  border-color: #00ff88;
+  transform: translateX(4px);
 }
 
 .task-level {
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  margin-right: 15px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex-shrink: 0;
 }
 
 .level-beginner {
-  background-color: #f0f9eb;
-  color: #67C23A;
+  background: rgba(102, 194, 58, 0.15);
+  color: #00ff88;
+  border: none;
 }
 
 .level-intermediate {
-  background-color: #fdf6ec;
-  color: #E6A23C;
+  background: rgba(230, 162, 60, 0.15);
+  color: #ffa500;
+  border: none;
 }
 
 .level-advanced {
-  background-color: #ecf5ff;
-  color: #409EFF;
+  background: rgba(0, 212, 255, 0.15);
+  color: #00d4ff;
+  border: none;
 }
 
 .task-info {
   flex: 1;
+  min-width: 0;
 }
 
 .task-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #303133;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .task-desc {
   font-size: 12px;
-  color: #909399;
-  margin-top: 4px;
+  color: #6b7280;
 }
 
 .task-action {
-  color: #409EFF;
-  font-size: 14px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
-/* 今日推荐 */
+.action-icon {
+  font-size: 12px;
+  color: #00ff88;
+}
+
+/* 知识列表 */
 .knowledge-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .knowledge-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .knowledge-item:hover {
-  border-color: #409EFF;
-  background-color: #ecf5ff;
+  border-color: #00d4ff;
+  transform: translateX(4px);
 }
 
 .knowledge-icon {
-  font-size: 20px;
-  margin-right: 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.knowledge-icon span {
+  font-size: 22px;
+}
+
+.knowledge-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .knowledge-title {
-  flex: 1;
   font-size: 14px;
-  color: #303133;
+  font-weight: 500;
 }
 
 .knowledge-action {
-  color: #409EFF;
-  font-size: 14px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.history-record-section {
-  margin-top: 30px;
+.action-arrow {
+  font-size: 20px;
+  color: #00d4ff;
+  transition: transform 0.3s ease;
 }
 
-.history-record-section h3 {
-  font-size: 18px;
-  font-weight: bold;
-  color: #303133;
-  margin-bottom: 15px;
+.knowledge-item:hover .action-arrow {
+  transform: translateX(4px);
+}
+
+/* 历史记录 */
+.history-section {
+  margin-bottom: 0;
+}
+
+.history-wrapper {
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+}
+
+/* Element Plus 自定义样式 */
+:deep(.el-card) {
+  background: transparent !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 16px !important;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%) !important;
+  border: none !important;
+  color: #0a0e14 !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+}
+
+:deep(.el-button--primary:hover) {
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.4) !important;
+}
+
+:deep(.el-progress__bar) {
+  background-color: #1f2937 !important;
+}
+
+:deep(.el-progress__bar__inner) {
+  border-radius: 10px !important;
 }
 </style>
